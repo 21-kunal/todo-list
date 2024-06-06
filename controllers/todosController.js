@@ -4,6 +4,12 @@ const todosController = {
   createTodo: (req, res) => {
     const { title, content } = req.body;
 
+    if (!title || !content) {
+      return res
+        .status(400)
+        .send({ message: "Title and content are required" });
+    }
+
     todosModel.insert(title, content, (err) => {
       if (err) {
         console.error("Error inserting data:", err.message);
@@ -34,7 +40,13 @@ const todosController = {
   getTodoById: (req, res) => {
     const id = req.params.id;
 
-    todosModel.getOne(id, (err, row) => {
+    if (isNaN(parseInt(id))) {
+      return res
+        .status(400)
+        .send({ message: "ID parameter must be a valid integer" });
+    }
+
+    todosModel.getOne(parseInt(id), (err, row) => {
       if (err) {
         console.error(`Error fetching todos with id(${id}):`, err.message);
         return res.status(500).send({ message: "Internal server error" });
@@ -54,7 +66,19 @@ const todosController = {
     const id = req.params.id;
     const { title, content, status } = req.body;
 
-    todosModel.getOne(id, (err, row) => {
+    if (isNaN(parseInt(id))) {
+      return res
+        .status(400)
+        .send({ message: "ID parameter must be a valid integer" });
+    }
+
+    if (!title || !content || !status) {
+      return res
+        .status(400)
+        .send({ message: "Title, content, and status are required" });
+    }
+
+    todosModel.getOne(parseInt(id), (err, row) => {
       if (err) {
         console.error(`Error fetching todos with id(${id}):`, err.message);
         return res.status(500).send({ message: "Internal server error" });
@@ -66,7 +90,7 @@ const todosController = {
           .send({ message: `Todo with id(${id}) is not found` });
       }
 
-      todosModel.update(id, title, content, status, (err) => {
+      todosModel.update(parseInt(id), title, content, status, (err) => {
         if (err) {
           console.error(`Error updating todos with id(${id}):`, err.message);
           return res.status(500).send({ message: "Error occurred" });
@@ -79,7 +103,13 @@ const todosController = {
   deleteTodo: (req, res) => {
     const id = req.params.id;
 
-    todosModel.getOne(id, (err, row) => {
+    if (isNaN(parseInt(id))) {
+      return res
+        .status(400)
+        .send({ message: "ID parameter must be a valid integer" });
+    }
+
+    todosModel.getOne(parseInt(id), (err, row) => {
       if (err) {
         console.error(`Error fetching todos with id(${id}):`, err.message);
         return res.status(500).send({ message: "Internal server error" });
@@ -91,7 +121,7 @@ const todosController = {
           .send({ message: `Todo with id(${id}) is not found` });
       }
 
-      todosModel.deleteById(id, (err) => {
+      todosModel.deleteById(parseInt(id), (err) => {
         if (err) {
           console.error(`Error deleting todo with id(${id}):`, err.message);
           return res.status(500).send({ message: "Error occurred" });
